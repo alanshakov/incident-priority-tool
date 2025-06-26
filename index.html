@@ -8,43 +8,37 @@
     body {
       font-family: Arial, sans-serif;
       background: #f4f4f4;
-      padding: 10px;
+      margin: 0;
+      padding: 0;
     }
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: auto;
       background: #fff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 40px;
     }
-    .column {
-      flex: 1 1 45%;
-      min-width: 300px;
-    }
-    h1 {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-      width: 100%;
-    }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-    .checkbox-group label {
-      display: block;
-      margin-bottom: 8px;
-    }
-    .result {
+    .sticky-result {
+      position: sticky;
+      top: 0;
       background: #eaf7ea;
       padding: 15px;
       border-left: 4px solid #28a745;
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      z-index: 10;
+    }
+    h1 {
+      font-size: 1.5em;
+      margin: 0 0 10px 0;
+    }
+    h2 {
+      font-size: 1.2em;
+      margin: 20px 0 10px;
+    }
+    .checkbox-group label {
+      display: block;
+      margin-bottom: 6px;
     }
     .button {
       margin-top: 20px;
@@ -56,7 +50,7 @@
       border-radius: 4px;
     }
     details {
-      margin-bottom: 16px;
+      margin-bottom: 10px;
     }
     summary {
       cursor: pointer;
@@ -65,10 +59,16 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="sticky-result" id="result">
     <h1>🚨 Incident Priority Calculator</h1>
+    Priority: <strong id="priority">P4</strong><br>
+    Total Score: <span id="score">0</span>
+    <br>
+    <button class="button" onclick="saveToConfluence()">OK – Create Incident Page</button>
+  </div>
 
-    <div class="column">
+  <div class="container">
+    <div>
       <h2>Audience Affected</h2>
       <div class="checkbox-group" id="audience">
         <label><input type="checkbox" value="10"> All players (10)</label>
@@ -82,9 +82,16 @@
         <label><input type="checkbox" value="1"> XS size brand affected (1)</label>
         <label><input type="checkbox" value="3"> VIP-players (3)</label>
       </div>
+
+      <h2>Brands by Size</h2>
+      <details><summary>XL brands</summary><p>ninecasino, betonred, bdmbet</p></details>
+      <details><summary>L brands</summary><p>ninewin, vincispin, liraspin, kinghills, brunocasino, oscarspin, jokabet, spinmama, coolzino</p></details>
+      <details><summary>M brands</summary><p>savaspin, b7casino, nyxbets, fridayroll, billionairespin, candyspinz, crystalroll, memocasino, vipzino, katanaspin, xtraspin, felixspin, jackpotraider, f7casino, r2pbet, highflybet, zumospin, betsixty, nomaspin, carlospin, winaura, wbetz, spinbuddha, gigaspinz</p></details>
+      <details><summary>S brands</summary><p>rockyspin, cryptoleo, lazybar, heyspin, capospin, romancasino, godofcoins, getslots, bettyspin, pinocasino, duxcasino, rolldorado, whitelabel_1, gambloria</p></details>
+      <details><summary>XS brands</summary><p>turbowinz, roulettino, blazingwildz, honeybetz, spinmacho, ivybet, corgibet, betgrouse, betonred-ng, playjonny, spingranny, piperspin, octocasino, heyspin.dk, morospin</p></details>
     </div>
 
-    <div class="column">
+    <div>
       <h2>Functionality Affected</h2>
       <div class="checkbox-group" id="functionality">
         <label><input type="checkbox" value="12"> Deposit (12)</label>
@@ -97,30 +104,11 @@
         <label><input type="checkbox" value="3"> Promo/bonuses (3)</label>
       </div>
 
-      <h2>Brands by Size</h2>
-      <details>
-        <summary>L brands</summary>
-        <p>ninewin, vincispin, liraspin, kinghills, brunocasino, oscarspin, jokabet, spinmama, coolzino</p>
-      </details>
-      <details>
-        <summary>M brands</summary>
-        <p>savaspin, b7casino, nyxbets, fridayroll, billionairespin, candyspinz, crystalroll, memocasino, vipzino, katanaspin, xtraspin, felixspin, jackpotraider, f7casino, r2pbet, highflybet, zumospin, betsixity, nomaspin, carlospin, winaura, wbetz, spinbuddha, gigaspinz</p>
-      </details>
-      <details>
-        <summary>S brands</summary>
-        <p>rockyspin, cryptoleo, lazybar, heyspin, capospin, romancasino, godofcoins, getslots, bettyspin, pinocasino, duxcasino, rolldorado, whitelabel_1, gambloria</p>
-      </details>
-      <details>
-        <summary>XS brands</summary>
-        <p>turbowinz, roulettino, blazingwildz, honeybetz, spinmacho, ivybet, corgibet, betgrouse, betonred-ng, playjonny, springranny, piperspin, octocasino, heyspin.dk, morospin</p>
-      </details>
-    </div>
-
-    <div class="result" id="result">
-      Priority: <strong id="priority">P4</strong><br>
-      Total Score: <span id="score">0</span>
-      <br>
-      <button class="button" onclick="saveToConfluence()">OK – Create Incident Page</button>
+      <h2>Time Factors</h2>
+      <div class="checkbox-group" id="time">
+        <label><input type="checkbox" value="3"> Prime time, 18–23h (3)</label>
+        <label><input type="checkbox" value="2"> Weekend or holiday (2)</label>
+      </div>
     </div>
   </div>
 
