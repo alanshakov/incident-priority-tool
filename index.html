@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incident Priority Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+    .checkbox-group label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .result {
+      background: #eaf7ea;
+      padding: 15px;
+      margin-top: 20px;
+      border-left: 4px solid #28a745;
+    }
+    .button {
+      margin-top: 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚨 Incident Priority Calculator</h1>
+
+    <h2>Audience Affected</h2>
+    <div class="checkbox-group" id="audience">
+      <label><input type="checkbox" value="10"> All players (10)</label>
+      <label><input type="checkbox" value="6"> 1 or more providers entirely (6)</label>
+      <label><input type="checkbox" value="5"> XL size provider affected (5)</label>
+      <label><input type="checkbox" value="4"> L size provider affected (4)</label>
+      <label><input type="checkbox" value="3"> M size provider affected (3)</label>
+      <label><input type="checkbox" value="4"> Multiple brands (4)</label>
+      <label><input type="checkbox" value="3"> One brand (3)</label>
+      <label><input type="checkbox" value="3"> VIP-players (3)</label>
+    </div>
+
+    <h2>Functionality Affected</h2>
+    <div class="checkbox-group" id="functionality">
+      <label><input type="checkbox" value="12"> Deposit (12)</label>
+      <label><input type="checkbox" value="12"> Withdrawal (12)</label>
+      <label><input type="checkbox" value="8"> Registration (8)</label>
+      <label><input type="checkbox" value="8"> Authorization (8)</label>
+      <label><input type="checkbox" value="6"> Games don't work (6)</label>
+      <label><input type="checkbox" value="5"> Bets/Winnings calculation (5)</label>
+      <label><input type="checkbox" value="3"> Freespins (3)</label>
+      <label><input type="checkbox" value="3"> Promo/bonuses (3)</label>
+    </div>
+
+    <h2>Time Factors</h2>
+    <div class="checkbox-group" id="time">
+      <label><input type="checkbox" value="3"> Prime time, 18–23h (3)</label>
+      <label><input type="checkbox" value="2"> Weekend or holiday (2)</label>
+    </div>
+
+    <div class="result" id="result">
+      Priority: <strong id="priority">P4</strong><br>
+      Total Score: <span id="score">0</span>
+    </div>
+
+    <button class="button" onclick="saveToConfluence()">OK – Create Incident Page</button>
+  </div>
+
+  <script>
+    const checkboxes = document.querySelectorAll('input[type=\"checkbox\"]');
+
+    function calculate() {
+      let score = 0;
+      checkboxes.forEach(cb => {
+        if (cb.checked) score += parseInt(cb.value);
+      });
+      let priority = 'P4';
+      if (score >= 15) priority = 'P0';
+      else if (score >= 10) priority = 'P1';
+      else if (score >= 7) priority = 'P2';
+      else if (score >= 1) priority = 'P3';
+
+      document.getElementById('score').textContent = score;
+      document.getElementById('priority').textContent = priority;
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
+    calculate();
+
+    function saveToConfluence() {
+      const title = `Incident – ${new Date().toLocaleString()} – ${document.getElementById('priority').textContent}`;
+      const body = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => `- ${cb.parentElement.innerText}`)
+        .join('\\n');
+      const fullBody = `Priority: ${document.getElementById('priority').textContent}\\nScore: ${document.getElementById('score').textContent}\\nSelected:\\n${body}`;
+
+      alert(\"Simulated saving to Confluence:\\n\" + fullBody);
+    }
+  </script>
+</body>
+</html>
