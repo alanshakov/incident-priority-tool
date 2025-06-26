@@ -89,37 +89,38 @@
     <button class="button" onclick="saveToConfluence()">OK – Create Incident Page</button>
   </div>
 
-  <script>
-    const checkboxes = document.querySelectorAll('input[type=\"checkbox\"]');
+<script>
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-    function calculate() {
-      let score = 0;
-      checkboxes.forEach(cb => {
-        if (cb.checked) score += parseInt(cb.value);
-      });
-      let priority = 'P4';
-      if (score >= 15) priority = 'P0';
-      else if (score >= 10) priority = 'P1';
-      else if (score >= 7) priority = 'P2';
-      else if (score >= 1) priority = 'P3';
+  function calculate() {
+    let score = 0;
+    checkboxes.forEach(cb => {
+      if (cb.checked) score += parseInt(cb.value);
+    });
+    let priority = 'P4';
+    if (score >= 15) priority = 'P0';
+    else if (score >= 10) priority = 'P1';
+    else if (score >= 7) priority = 'P2';
+    else if (score >= 1) priority = 'P3';
 
-      document.getElementById('score').textContent = score;
-      document.getElementById('priority').textContent = priority;
-    }
+    document.getElementById('score').textContent = score;
+    document.getElementById('priority').textContent = priority;
+  }
 
-    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
-    calculate();
+  checkboxes.forEach(cb => cb.addEventListener('change', calculate));
+  calculate();
 
-    function saveToConfluence() {
-      const title = `Incident – ${new Date().toLocaleString()} – ${document.getElementById('priority').textContent}`;
-      const body = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => `- ${cb.parentElement.innerText}`)
-        .join('\\n');
-      const fullBody = `Priority: ${document.getElementById('priority').textContent}\\nScore: ${document.getElementById('score').textContent}\\nSelected:\\n${body}`;
+  function saveToConfluence() {
+    const title = `Incident – ${new Date().toLocaleString()} – ${document.getElementById('priority').textContent}`;
+    const body = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => `- ${cb.parentElement.innerText}`)
+      .join('\n');
+    const fullBody = `Priority: ${document.getElementById('priority').textContent}\nScore: ${document.getElementById('score').textContent}\nSelected:\n${body}`;
 
-      alert(\"Simulated saving to Confluence:\\n\" + fullBody);
-    }
-  </script>
+    alert("Simulated saving to Confluence:\n" + fullBody);
+  }
+</script>
+
 </body>
 </html>
