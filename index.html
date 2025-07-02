@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Incident Priority Calculator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background: #f4f4f4;
       margin: 0;
       padding: 0;
@@ -23,31 +23,36 @@
     .sticky-result {
       position: sticky;
       top: 0;
-      background: #eaf7ea;
-      padding: 15px;
-      border-left: 4px solid #28a745;
+      padding: 20px;
+      color: white;
+      text-align: center;
       z-index: 10;
+      transition: background 0.3s ease;
     }
-    h1 {
-      font-size: 1.5em;
-      margin: 0 0 10px 0;
+    .priority {
+      font-size: 2em;
+      font-weight: bold;
     }
-    h2 {
+    .score {
       font-size: 1.2em;
-      margin: 20px 0 10px;
+      margin-bottom: 10px;
+    }
+    .button {
+      background: rgba(0,0,0,0.1);
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
     }
     .checkbox-group label {
       display: block;
       margin-bottom: 6px;
     }
-    .button {
-      margin-top: 20px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 4px;
+    h2 {
+      font-size: 1.2em;
+      margin: 20px 0 10px;
     }
     details {
       margin-bottom: 10px;
@@ -60,11 +65,9 @@
 </head>
 <body>
   <div class="sticky-result" id="result">
-    <h1>🚨 Incident Priority Calculator</h1>
-    Priority: <strong id="priority">P4</strong><br>
-    Total Score: <span id="score">0</span>
-    <br>
-    <button class="button" onclick="saveToConfluence()">OK – Create Incident Page</button>
+    <div class="priority" id="priority">Priority: P4</div>
+    <div class="score">Total Score: <span id="score">0</span></div>
+    <button class="button" onclick="copyToClipboard()">Copy Incident Data</button>
   </div>
 
   <div class="container">
@@ -114,35 +117,51 @@
 
   <script>
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const priorityEl = document.getElementById('priority');
+    const scoreEl = document.getElementById('score');
+    const resultEl = document.getElementById('result');
 
     function calculate() {
       let score = 0;
       checkboxes.forEach(cb => {
         if (cb.checked) score += parseInt(cb.value);
       });
+
       let priority = 'P4';
       if (score >= 15) priority = 'P0';
       else if (score >= 10) priority = 'P1';
       else if (score >= 7) priority = 'P2';
       else if (score >= 1) priority = 'P3';
 
-      document.getElementById('score').textContent = score;
-      document.getElementById('priority').textContent = priority;
+      scoreEl.textContent = score;
+      priorityEl.textContent = `Priority: ${priority}`;
+      updateBackground(priority);
+    }
+
+    function updateBackground(priority) {
+      const colors = {
+        P0: '#8B0000', // dark red
+        P1: '#FF8C00', // dark orange
+        P2: '#FFD700', // gold
+        P3: '#9ACD32', // yellowgreen
+        P4: '#B0B0B0'  // light gray
+      };
+      resultEl.style.backgroundColor = colors[priority] || '#B0B0B0';
+    }
+
+    function copyToClipboard() {
+      const selected = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => `- ${cb.parentElement.innerText}`)
+        .join('\n');
+      const text = `${priorityEl.textContent}\nScore: ${scoreEl.textContent}\nSelected:\n${selected}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Incident data copied to clipboard.");
+      });
     }
 
     checkboxes.forEach(cb => cb.addEventListener('change', calculate));
     calculate();
-
-    function saveToConfluence() {
-      const title = `Incident – ${new Date().toLocaleString()} – ${document.getElementById('priority').textContent}`;
-      const body = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => `- ${cb.parentElement.innerText}`)
-        .join('\n');
-      const fullBody = `Priority: ${document.getElementById('priority').textContent}\nScore: ${document.getElementById('score').textContent}\nSelected:\n${body}`;
-
-      alert("Simulated saving to Confluence:\n" + fullBody);
-    }
   </script>
 </body>
 </html>
