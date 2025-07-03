@@ -74,16 +74,14 @@
     <div>
       <h2>Audience Affected</h2>
       <div class="checkbox-group" id="audience">
-        <label><input type="checkbox" value="10"> All players (10)</label>
-        <label><input type="checkbox" value="6"> 1 or more providers entirely (6)</label>
-        <label><input type="checkbox" value="4"> Multiple brands (4)</label>
-        <label><input type="checkbox" value="3"> One brand (3)</label>
-        <label><input type="checkbox" value="5"> XL size brand affected (5)</label>
-        <label><input type="checkbox" value="4"> L size brand affected (4)</label>
+        <label><input type="checkbox" value="20"> All players (20)</label>
+        <label><input type="checkbox" value="10"> 1 or more providers entirely (10)</label>
+        <label><input type="checkbox" value="8"> XL size brand affected (8)</label>
+        <label><input type="checkbox" value="6"> L size brand affected (6)</label>
         <label><input type="checkbox" value="3"> M size brand affected (3)</label>
         <label><input type="checkbox" value="2"> S size brand affected (2)</label>
         <label><input type="checkbox" value="1"> XS size brand affected (1)</label>
-        <label><input type="checkbox" value="3"> VIP-players (3)</label>
+        <label><input type="checkbox" value="6"> VIP-players (6)</label>
       </div>
 
       <h2>Brands by Size</h2>
@@ -97,20 +95,23 @@
     <div>
       <h2>Functionality Affected</h2>
       <div class="checkbox-group" id="functionality">
+        <label><input type="checkbox" value="16"> Authorization (16)</label>
+        <label><input type="checkbox" value="14"> Registration (14)</label>
         <label><input type="checkbox" value="12"> Deposit (12)</label>
-        <label><input type="checkbox" value="12"> Withdrawal (12)</label>
-        <label><input type="checkbox" value="8"> Registration (8)</label>
-        <label><input type="checkbox" value="8"> Authorization (8)</label>
-        <label><input type="checkbox" value="6"> Games don't work (6)</label>
-        <label><input type="checkbox" value="5"> Bets/Winnings calculation (5)</label>
-        <label><input type="checkbox" value="3"> Freespins (3)</label>
-        <label><input type="checkbox" value="3"> Promo/bonuses (3)</label>
+        <label><input type="checkbox" value="10"> Withdrawal (10)</label>
+        <label><input type="checkbox" value="14"> Bets/Winnings calculation (14)</label>
+        <label><input type="checkbox" value="10"> Games don't work (10)</label>
+        <label><input type="checkbox" value="6"> Live games don't work (6)</label>
+        <label><input type="checkbox" value="2"> Freespins (2)</label>
+        <label><input type="checkbox" value="4"> Promo/bonuses (4)</label>
       </div>
 
       <h2>Time Factors</h2>
       <div class="checkbox-group" id="time">
-        <label><input type="checkbox" value="3"> Prime time, 18–23h (3)</label>
-        <label><input type="checkbox" value="2"> Weekend or holiday (2)</label>
+        <label><input type="checkbox" value="4"> Prime time, 18–23h (4)</label>
+        <label><input type="checkbox" value="3"> Weekend or holiday (3)</label>
+        <label><input type="checkbox" value="2"> Night (2)</label>
+        <label><input type="checkbox" value="6"> Major tournament/event (6)</label>
       </div>
     </div>
   </div>
@@ -128,10 +129,10 @@
       });
 
       let priority = 'P4';
-      if (score >= 15) priority = 'P0';
-      else if (score >= 10) priority = 'P1';
-      else if (score >= 7) priority = 'P2';
-      else if (score >= 1) priority = 'P3';
+      if (score >= 30) priority = 'P0';
+      else if (score >= 20) priority = 'P1';
+      else if (score >= 12) priority = 'P2';
+      else if (score >= 6)  priority = 'P3';
 
       scoreEl.textContent = score;
       priorityEl.textContent = `Priority: ${priority}`;
@@ -140,11 +141,11 @@
 
     function updateBackground(priority) {
       const colors = {
-        P0: '#8B0000', // dark red
-        P1: '#FF8C00', // dark orange
-        P2: '#FFD700', // gold
-        P3: '#9ACD32', // yellowgreen
-        P4: '#B0B0B0'  // light gray
+        P0: '#8B0000',
+        P1: '#FF8C00',
+        P2: '#FFD700',
+        P3: '#9ACD32',
+        P4: '#B0B0B0'
       };
       resultEl.style.backgroundColor = colors[priority] || '#B0B0B0';
     }
