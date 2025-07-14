@@ -50,6 +50,13 @@
       display: block;
       margin-bottom: 6px;
     }
+    .checkbox-group label.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .checkbox-group input:disabled {
+      cursor: not-allowed;
+    }
     h2 {
       font-size: 1.2em;
       margin: 20px 0 10px;
@@ -61,11 +68,22 @@
       cursor: pointer;
       font-weight: bold;
     }
+    .critical-option {
+      background-color: #ffe6e6;
+      border: 2px solid #ff6b6b;
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .critical-option label {
+      font-weight: bold;
+      color: #d63031;
+    }
   </style>
 </head>
 <body>
   <div class="sticky-result" id="result">
-    <div class="priority" id="priority">Priority: P4</div>
+    <div class="priority" id="priority">Priority: P5</div>
     <div class="score">Total Score: <span id="score">0</span></div>
     <button class="button" onclick="copyToClipboard()">Copy Incident Data</button>
   </div>
@@ -74,8 +92,12 @@
     <div>
       <h2>Audience Affected</h2>
       <div class="checkbox-group" id="audience">
+        <div class="critical-option">
+          <label><input type="checkbox" value="100" id="totalDowntime"> Total downtime</label>
+        </div>
         <label><input type="checkbox" value="20"> All players (20)</label>
         <label><input type="checkbox" value="10"> 1 or more providers entirely (10)</label>
+        <label><input type="checkbox" value="5"> B2B brand affected (5)</label>
         <label><input type="checkbox" value="8"> XL size brand affected (8)</label>
         <label><input type="checkbox" value="6"> L size brand affected (6)</label>
         <label><input type="checkbox" value="3"> M size brand affected (3)</label>
@@ -108,10 +130,10 @@
 
       <h2>Time Factors</h2>
       <div class="checkbox-group" id="time">
-        <label><input type="checkbox" value="4"> Prime time, 18–24h (4)</label>
-        <label><input type="checkbox" value="3"> Weekend or holiday (3)</label>
-        <label><input type="checkbox" value="2"> Working Day (2)</label>
         <label><input type="checkbox" value="6"> Major tournament/event (6)</label>
+        <label><input type="checkbox" value="4"> Prime time, 18–23h (4)</label>
+        <label><input type="checkbox" value="3"> Weekend or holiday (3)</label>
+        <label><input type="checkbox" value="2"> Working day (2)</label>
       </div>
     </div>
   </div>
@@ -121,33 +143,67 @@
     const priorityEl = document.getElementById('priority');
     const scoreEl = document.getElementById('score');
     const resultEl = document.getElementById('result');
+    const totalDowntimeCheckbox = document.getElementById('totalDowntime');
 
     function calculate() {
       let score = 0;
-      checkboxes.forEach(cb => {
-        if (cb.checked) score += parseInt(cb.value);
-      });
+      
+      // Если выбран Total downtime, устанавливаем P1 приоритет
+      if (totalDowntimeCheckbox.checked) {
+        score = 100; // Максимальный вес для P1
+        priorityEl.textContent = 'Priority: P1';
+        updateBackground('P1');
+      } else {
+        // Обычный расчет
+        checkboxes.forEach(cb => {
+          if (cb.checked && cb !== totalDowntimeCheckbox) {
+            score += parseInt(cb.value);
+          }
+        });
 
-      let priority = 'P4';
-      if (score >= 30) priority = 'P0';
-      else if (score >= 20) priority = 'P1';
-      else if (score >= 12) priority = 'P2';
-      else if (score >= 6)  priority = 'P3';
+        let priority = 'P5';
+        if (score >= 30) priority = 'P1';
+        else if (score >= 20) priority = 'P2';
+        else if (score >= 12) priority = 'P3';
+        else if (score >= 6) priority = 'P4';
 
+        priorityEl.textContent = `Priority: ${priority}`;
+        updateBackground(priority);
+      }
+      
       scoreEl.textContent = score;
-      priorityEl.textContent = `Priority: ${priority}`;
-      updateBackground(priority);
     }
 
     function updateBackground(priority) {
       const colors = {
-        P0: '#8B0000',
-        P1: '#FF8C00',
-        P2: '#FFD700',
-        P3: '#9ACD32',
-        P4: '#B0B0B0'
+        P1: '#8B0000',  // Темно-красный (критический)
+        P2: '#FF8C00',  // Оранжевый
+        P3: '#FFD700',  // Желтый
+        P4: '#9ACD32',  // Зеленый
+        P5: '#B0B0B0'   // Серый
       };
       resultEl.style.backgroundColor = colors[priority] || '#B0B0B0';
+    }
+
+    function toggleOtherCheckboxes() {
+      const isDowntimeChecked = totalDowntimeCheckbox.checked;
+      const otherCheckboxes = document.querySelectorAll('#audience input[type="checkbox"]:not(#totalDowntime)');
+      const functionalityCheckboxes = document.querySelectorAll('#functionality input[type="checkbox"]');
+      const timeCheckboxes = document.querySelectorAll('#time input[type="checkbox"]');
+      
+      // Блокируем/разблокируем другие чекбоксы
+      [...otherCheckboxes, ...functionalityCheckboxes, ...timeCheckboxes].forEach(cb => {
+        if (isDowntimeChecked) {
+          cb.disabled = true;
+          cb.checked = false;
+          cb.parentElement.classList.add('disabled');
+        } else {
+          cb.disabled = false;
+          cb.parentElement.classList.remove('disabled');
+        }
+      });
+      
+      calculate();
     }
 
     function copyToClipboard() {
@@ -161,7 +217,16 @@
       });
     }
 
-    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
+    // Добавляем обработчик для Total downtime
+    totalDowntimeCheckbox.addEventListener('change', toggleOtherCheckboxes);
+    
+    // Добавляем обработчики для остальных чекбоксов
+    checkboxes.forEach(cb => {
+      if (cb !== totalDowntimeCheckbox) {
+        cb.addEventListener('change', calculate);
+      }
+    });
+    
     calculate();
   </script>
 </body>
