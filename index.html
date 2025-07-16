@@ -33,9 +33,9 @@
       font-size: 2em;
       font-weight: bold;
     }
-    .score {
-      font-size: 1.2em;
-      margin-bottom: 10px;
+    .urgency, .sla {
+      font-size: 0.9em;
+      margin: 5px 0;
     }
     .button {
       background: rgba(0,0,0,0.1);
@@ -83,8 +83,9 @@
 </head>
 <body>
   <div class="sticky-result" id="result">
-    <div class="priority" id="priority">Priority: P5</div>
-    <div class="score">Total Score: <span id="score">0</span></div>
+    <div class="priority" id="priority">Priority: P5 [Total Score: 0]</div>
+    <div class="urgency" id="urgency">Срочность: Низкая (может быть отложено)</div>
+    <div class="sla" id="sla">SLA: Реакция < 3 рабочих дня, Решение < 10 рабочих дней / по согласованию</div>
     <button class="button" onclick="copyToClipboard()">Copy Incident Data</button>
   </div>
 
@@ -110,7 +111,7 @@
       <details><summary>XL brands</summary><p>ninecasino, betonred, bdmbet</p></details>
       <details><summary>L brands</summary><p>ninewin, <b><u>vincispin</u></b>, liraspin, kinghills, brunocasino, oscarspin, jokabet, spinmama, coolzino</p></details>
       <details><summary>M brands</summary><p>savaspin, b7casino, nyxbets, <b><u>fridayroll</u></b>, billionairespin, <b><u>candyspinz</u></b>, crystalroll, memocasino, <b><u>vipzino</u></b>, katanaspin, xtraspin, <b><u>felixspin</u></b>, jackpotraider, f7casino, r2pbet, <b><u>highflybet</u></b>, zumospin, betsixty, nomaspin, carlospin, <b><u>winaura</u></b>, wbetz, spinbuddha, gigaspinz</p></details>
-      <details><summary>S brands</summary><p><b><u>rockyspin</u></b>, cryptoleo, <b><u>lazybar</u></b>, heyspin, <b><u>capospin</u></b>, <b><u>romancasino</u></b>, <b><u>godofcoins</u></b>, getslots, <b><u>bettyspin</u></b>, pinocasino, duxcasino, <b><u>rolldorado</u></b>, whitelabel_1, <b><u>gambloria</u></b></p></details>
+      <details><summary>S brands</summary><p><b><u>rockyspin</u></b>, cryptoleo, <b><u>lazybar</u></b>, heyspin, <b><u>capospin</u></b>, <b><u>romancasino</u></b>, <b><u>godofcoins</u></b>, getslots, <b><u>bettyspin</u></b>, pinocasino, duxcasino, <b><u>rolldorado</u></b>, <b><u>whitelabel_1</u></b>, <b><u>gambloria</u></b></p></details>
       <details><summary>XS brands</summary><p>turbowinz, roulettino, blazingwildz, honeybetz, spinmacho, ivybet, corgibet, betgrouse, betonred-ng, <b><u>playjonny</u></b>, spingranny, piperspin, octocasino, heyspin.dk, <b><u>morospin</u></b></p></details>
     </div>
 
@@ -141,9 +142,33 @@
   <script>
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     const priorityEl = document.getElementById('priority');
-    const scoreEl = document.getElementById('score');
+    const urgencyEl = document.getElementById('urgency');
+    const slaEl = document.getElementById('sla');
     const resultEl = document.getElementById('result');
     const totalDowntimeCheckbox = document.getElementById('totalDowntime');
+
+    const priorityData = {
+      P1: {
+        urgency: 'Немедленная реакция, поддержка 24/7',
+        sla: 'SLA: Реакция < 5 минут, Решение < 2 час'
+      },
+      P2: {
+        urgency: 'Очень высокая',
+        sla: 'SLA: Реакция < 15 минут, Решение < 4 час'
+      },
+      P3: {
+        urgency: 'Высокая (в рамках рабочего дня)',
+        sla: 'SLA: Реакция < 2-4 часов, Решение < 1-2 рабочих дней'
+      },
+      P4: {
+        urgency: 'Средняя (плановое решение)',
+        sla: 'SLA: Реакция < 4-8 часов, Решение < 3-5 рабочих дней'
+      },
+      P5: {
+        urgency: 'Низкая (может быть отложено)',
+        sla: 'SLA: Реакция < 3 рабочих дня, Решение < 10 рабочих дней / по согласованию'
+      }
+    };
 
     function calculate() {
       let score = 0;
@@ -151,8 +176,7 @@
       // Если выбран Total downtime, устанавливаем P1 приоритет
       if (totalDowntimeCheckbox.checked) {
         score = 100; // Максимальный вес для P1
-        priorityEl.textContent = 'Priority: P1';
-        updateBackground('P1');
+        updatePriority('P1', score);
       } else {
         // Обычный расчет
         checkboxes.forEach(cb => {
@@ -167,11 +191,15 @@
         else if (score >= 12) priority = 'P3';
         else if (score >= 6) priority = 'P4';
 
-        priorityEl.textContent = `Priority: ${priority}`;
-        updateBackground(priority);
+        updatePriority(priority, score);
       }
-      
-      scoreEl.textContent = score;
+    }
+
+    function updatePriority(priority, score) {
+      priorityEl.textContent = `Priority: ${priority} [Total Score: ${score}]`;
+      urgencyEl.textContent = `Срочность: ${priorityData[priority].urgency}`;
+      slaEl.textContent = priorityData[priority].sla;
+      updateBackground(priority);
     }
 
     function updateBackground(priority) {
@@ -211,7 +239,7 @@
         .filter(cb => cb.checked)
         .map(cb => `- ${cb.parentElement.innerText}`)
         .join('\n');
-      const text = `${priorityEl.textContent}\nScore: ${scoreEl.textContent}\nSelected:\n${selected}`;
+      const text = `${priorityEl.textContent}\n${urgencyEl.textContent}\n${slaEl.textContent}\nSelected:\n${selected}`;
       navigator.clipboard.writeText(text).then(() => {
         alert("Incident data copied to clipboard.");
       });
